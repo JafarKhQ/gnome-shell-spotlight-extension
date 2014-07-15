@@ -1,0 +1,9 @@
+{
+   "shell-version": ["3.10"],
+   "uuid": "gnome_spotlight@memleak.me",
+   "name": "Gnome Spotlight",
+   "description": "A spotlight for gnome",
+   "url": "https://github.com/jafarkhq/xxxx",
+   "localedir": "locale",
+   "original-authors": "Jafar Qaddoumi"
+}

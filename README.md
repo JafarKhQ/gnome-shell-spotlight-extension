@@ -1,4 +1,4 @@
-gnome-shell-spotlight-extension
+Gnome Spotlight
 ===============================
 
 A spotlight extension for gnome shell
