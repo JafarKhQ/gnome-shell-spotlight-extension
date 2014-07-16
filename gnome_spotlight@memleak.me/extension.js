@@ -1,53 +1,77 @@
 
+// extension root object
+const Me = imports.misc.extensionUtils.getCurrentExtension();
+
+// aliases for used modules
 const St = imports.gi.St;
+const Lang = imports.lang;
 const Main = imports.ui.main;
-const Tweener = imports.ui.tweener;
+const PopupMenu = imports.ui.popupMenu;
+const PanelMenu = imports.ui.panelMenu;
 
-let text, button;
-
-function _hideHello() {
-    Main.uiGroup.remove_actor(text);
-    text = null;
-}
-
-function _showHello() {
-    if (!text) {
-        text = new St.Label({ style_class: 'helloworld-label', text: "Hello, world!" });
-        Main.uiGroup.add_actor(text);
+const SpotlightIndicator = Lang.Class({
+	Name: 'SpotlightIndicator',
+	Extends: PanelMenu.Button,
+	
+	_init: function() {
+		this.parent(0.0, 'SpotlightIndicator');
+		
+		this.actor.add_actor(new St.Icon({
+			 icon_name: 'system-search',
+			 style_class: 'popup-menu-icon'
+		}));
+	}
+	
+	/*
+	destroy: function () {
+		// Call parent ??
+        this.parent();
     }
+    */
+});
 
-    text.opacity = 255;
 
-    let monitor = Main.layoutManager.primaryMonitor;
+/*
+* Extension definition.
+*/
 
-    text.set_position(Math.floor(monitor.width / 2 - text.width / 2),
-                      Math.floor(monitor.height / 2 - text.height / 2));
+let spotlightIndicator;
 
-    Tweener.addTween(text,
-                     { opacity: 0,
-                       time: 2,
-                       transition: 'easeOutQuad',
-                       onComplete: _hideHello });
+function Extension() {
+    this._init();
 }
 
+Extension.prototype = {
+	_init: function() {
+		this._indicator = null;
+		this._settings = Convenience.getSettings();
+        this._traymanager = _compat.getTrayManager();
+        this._statusArea = Main.panel.statusArea;
+	},
+	
+	enable: function() {
+		this._indicator = new SpotlightIndicator();
+		Main.panel.addToStatusArea("SpotlightIndicator", this._indicator);
+	},
+	
+	/**
+	* Clean-up:
+	* - destroy indicator
+	*/
+	disable: function() {
+		
+		// destroy extension indicator
+		this._indicator.destroy();
+        this._indicator = null;
+	}
+};
+
+
+/**
+* Entry point.
+*
+* Should return an object with callable `enable` and `disable` properties.
+*/
 function init() {
-    button = new St.Bin({ style_class: 'panel-button',
-                          reactive: true,
-                          can_focus: true,
-                          x_fill: true,
-                          y_fill: false,
-                          track_hover: true });
-    let icon = new St.Icon({ icon_name: 'system-run-symbolic',
-                             style_class: 'system-status-icon' });
-
-    button.set_child(icon);
-    button.connect('button-press-event', _showHello);
-}
-
-function enable() {
-    Main.panel._rightBox.insert_child_at_index(button, 0);
-}
-
-function disable() {
-    Main.panel._rightBox.remove_child(button);
+	return new Extension();
 }
